@@ -6,7 +6,7 @@
 /*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 11:05:09 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/25 14:28:38 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/08/25 17:36:00 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,12 @@
 # define BUFFER_SIZE 1024
 #endif
 
-#define BLOCK_A 0x67452301
-#define BLOCK_B 0xEFCDAB89
-#define BLOCK_C 0x98BADCFE
-#define BLOCK_D 0x10325476
+/*=================== MD5 ============*/
+
+#define SHA_BLOCK_A 0x67452301
+#define SHA_BLOCK_B 0xEFCDAB89
+#define SHA_BLOCK_C 0x98BADCFE
+#define SHA_BLOCK_D 0x10325476
 
 #define ROTATE_LEFT(x, s) (((x) << (s)) | ((x) >> (32 - (s))))
 #define F(x, y, z) (((x) & (y)) | (~(x) & (z)))
@@ -35,6 +37,25 @@
 #define H(x, y, z) ((x) ^ (y) ^ (z))
 #define I(x, y, z) ((y) ^ ((x) | ~(z)))
 
+/*=================== SHA256 ============*/
+
+#define SHA256_BLOCK_A 0x6a09e667
+#define SHA256_BLOCK_B 0xbb67ae85
+#define SHA256_BLOCK_C 0x3c6ef372
+#define SHA256_BLOCK_D 0xa54ff53a
+#define SHA256_BLOCK_E 0x510e527f
+#define SHA256_BLOCK_F 0x9b05688c
+#define SHA256_BLOCK_G 0x1f83d9ab
+#define SHA256_BLOCK_H 0x5be0cd19
+
+#define CH(x, y, z) (((x) & (y)) ^ (~(x) & (z)))
+#define MAJ(x, y, z) (((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z)))
+#define ROTRIGHT(x, n) (((x) >> (n)) | ((x) << (32 - (n)))) 
+
+#define LIL_SIG0(x) (ROTRIGHT(x, 7) ^ ROTRIGHT(x, 18) ^ ((x) >> 3))
+#define LIL_SIG1(x) (ROTRIGHT(x, 17) ^ ROTRIGHT(x, 19) ^ ((x) >> 10))
+#define BIG_SIG0(x) (ROTRIGHT(x, 2) ^ ROTRIGHT(x, 13) ^ ROTRIGHT(x, 22))
+#define BIG_SIG1(x) (ROTRIGHT(x, 6) ^ ROTRIGHT(x, 11) ^ ROTRIGHT(x, 25))
 
 /*=============== STRUCTURES ===========*/
 
@@ -93,5 +114,11 @@ char	*read_file(const char *filename);
 uint8_t	*md5_pad(const uint8_t *msg, size_t len, size_t *new_len_out);
 char	*md5_hash(const char *input);
 char	*md5_format_result(uint32_t A, uint32_t B, uint32_t C, uint32_t D);
+
+/*================ SHA256 =============*/
+
+uint8_t	*sha_pad(const uint8_t *msg, size_t len, size_t *padded_len_out);
+char	*sha256_hash(const char *input);
+char	*sha256_format_result(uint32_t H[8]);
 
 #endif

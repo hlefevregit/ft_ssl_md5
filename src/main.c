@@ -6,7 +6,7 @@
 /*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 11:09:41 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/25 14:38:38 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/08/25 17:40:42 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@ char	*run_hash(const char *type, const char *input) {
         return NULL;
     if (strcmp(type, "md5") == 0)
         return md5_hash(input);
-    // else if (strcmp(type, "sha256") == 0)
-    //     return sha256_hash(input);
+    else if (strcmp(type, "sha256") == 0)
+        return sha256_hash(input);
     return NULL;
 }
 

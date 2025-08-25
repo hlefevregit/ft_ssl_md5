@@ -11,6 +11,9 @@ SRCS        := ./src/main.c \
 			./src/md5/hash.c \
 			./src/md5/padding.c \
 			./src/md5/result.c \
+			./src/sha256/hash.c \
+			./src/sha256/padding.c \
+			./src/sha256/result.c \
 
 OBJS        := $(SRCS:.c=.o)
 

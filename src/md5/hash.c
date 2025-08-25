@@ -6,7 +6,7 @@
 /*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 13:46:16 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/25 14:25:21 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/08/25 16:41:35 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,10 +57,10 @@ char	*md5_hash(const char *input)
 	if (!padded)
 		return NULL;
 
-	uint32_t A = BLOCK_A;
-	uint32_t B = BLOCK_B;
-	uint32_t C = BLOCK_C;
-	uint32_t D = BLOCK_D;
+	uint32_t A = 0x67452301; // MD5 initial value for A
+	uint32_t B = 0xEFCDAB89; // MD5 initial value for B
+	uint32_t C = 0x98BADCFE; // MD5 initial value for C
+	uint32_t D = 0x10325476; // MD5 initial value for D
 
 	for (size_t offset = 0; offset < padded_len; offset += 64) {
 		
