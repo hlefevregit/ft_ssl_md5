@@ -61,12 +61,12 @@ Ce fichier décrit en détail l'algorithme, depuis le padding jusqu'au hash fina
           v
 +---------------------------------------------------+
 | Ajout aux hash courants :                         |
-| H₀ += a, H₁ += b, ..., H₇ += h                     |
+| H₀ += a, H₁ += b, ..., H₇ += h                    |
 +---------------------------------------------------+
           |
           v
 +------------------------------+
-|  Résultat final SHA-256     |
+|  Résultat final SHA-256      |
 |  = H₀ || H₁ || ... || H₇     |
 +------------------------------+
 ```
