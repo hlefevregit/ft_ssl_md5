@@ -80,8 +80,8 @@ ft_ssl/
 
 Chaque algorithme a son propre README pour une compréhension approfondie :
 
-- [`md5/README.md`](md5/README.md)
-- [`sha256/README_SHA256.md`](sha256/README_SHA256.md)
+- [`md5/README.md`](src/md5/README.md)
+- [`sha256/README_SHA256.md`](src/sha256/README.md)
 
 ---
 
