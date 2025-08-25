@@ -54,19 +54,23 @@ SHA256 ("hello") = 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9
 ```
 ft_ssl/
 ├── Makefile
-├── main.c
 ├── includes/
-│   └── ft_ssl.h
-├── md5/
-│   ├── md5.c
-│   ├── padding.c
-│   ├── hash.c
-│   └── README.md  ← Explication complète de l'algo MD5
-├── sha256/
-│   ├── sha256.c
-│   ├── padding.c
-│   ├── hash.c
-│   └── README_SHA256.md  ← Explication complète SHA-256
+│   └── ft_ssl_md5.h
+├── src/
+|   ├── md5/
+│   |   ├── hash.c
+│   |   ├── padding.c
+│   |   ├── hash.c
+│   |   └── README.md  ← Explication complète de l'algo MD5
+|   ├── sha256/
+│   |   ├── hash.c
+│   |   ├── padding.c
+│   |   ├── hash.c
+│   |   └── README.md  ← Explication complète SHA-256
+|   ├── main.c
+|   ├── parser.c
+|   ├── reader.c
+|   └── utils.c
 └── README.md  ← (ce fichier)
 ```
 
