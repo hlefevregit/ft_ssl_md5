@@ -14,15 +14,15 @@ Ce fichier décrit en détail l'algorithme, depuis le padding jusqu'au hash fina
           |
           v
 +-----------------------------+
-|          Padding           |
-|  - ajout de 0x80           |
-|  - 0x00 jusqu’à 448 mod 512|
-|  - taille (64 bits BE)     |
+|          Padding            |
+|  - ajout de 0x80            |
+|  - 0x00 jusqu’à 448 mod 512 |
+|  - taille (64 bits BE)      |
 +-----------------------------+
           |
           v
 +------------------------------+
-|  Découpage en blocs de 512b |
+|  Découpage en blocs de 512b  |
 +------------------------------+
      |       |       |
      v       v       v
