@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 11:51:57 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/26 11:20:27 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/08/26 18:20:58 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,37 +77,40 @@ int	parse_args(t_context *ctx, int ac, char **av)
 {
 	int i = 2;
 	int saw_stdin = 0;
+	if (ft_strcmp(ctx->type, "sha256") == 0 || ft_strcmp(ctx->type, "md5") == 0) {
+		while (i < ac) {
+			int matched = 0;
 
-	while (i < ac) {
-		int matched = 0;
-
-		// Check if the arg is a known flag
-		for (int j = 0; g_flags[j].flag; j++) {
-			if (!ft_strcmp(av[i], g_flags[j].flag)) {
-				if (g_flags[j].handler(ctx, av, &i))
+			// Check if the arg is a known flag
+			for (int j = 0; g_flags[j].flag; j++) {
+				if (!ft_strcmp(av[i], g_flags[j].flag)) {
+					if (g_flags[j].handler(ctx, av, &i))
+						return 1;
+					if (!ft_strcmp(av[i], "-p"))
+						saw_stdin = 1;
+					matched = 1;
+					break;
+				}
+			}
+			if (!matched) {
+				if (av[i][0] == '-' && av[i][1] != '\0') {
+					write(2, "ft_ssl: ", 8);
+					write(2, ctx->type, ft_strlen(ctx->type));
+					write(2, ": ", 2);
+					write(2, av[i], ft_strlen(av[i]));
+					write(2, ": Invalid option\n", 17);
 					return 1;
-				if (!ft_strcmp(av[i], "-p"))
-					saw_stdin = 1;
-				matched = 1;
-				break;
+				}
+				add_input(ctx, INPUT_FILE, av[i]);
 			}
+			i++;
 		}
-		if (!matched) {
-			if (av[i][0] == '-' && av[i][1] != '\0') {
-				write(2, "ft_ssl: ", 8);
-				write(2, ctx->type, ft_strlen(ctx->type));
-				write(2, ": ", 2);
-				write(2, av[i], ft_strlen(av[i]));
-				write(2, ": Invalid option\n", 17);
-				return 1;
-			}
-			add_input(ctx, INPUT_FILE, av[i]);
-		}
-		i++;
-	}
-	if (!ctx->inputs && !saw_stdin)
-		add_input(ctx, INPUT_STDIN, NULL);
-
+		if (!ctx->inputs && !saw_stdin)
+			add_input(ctx, INPUT_STDIN, NULL);
+	} 
+	// printf("encode: %d\n", ctx->b64_flags.encode);
+	// printf("infile: %s\n", ctx->b64_flags.infile);
+	// printf("outfile: %s\n", ctx->b64_flags.outfile);
 	return 0;
 }
 

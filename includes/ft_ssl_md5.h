@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_ssl_md5.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 11:05:09 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/26 11:20:10 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/08/26 18:16:34 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,9 @@
 # define FT_SSL_MD5
 
 
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <fcntl.h>
-#include <stdint.h>
+
+#include "ft_types.h"
+#include "ft_ssl_des.h"
 
 #ifndef BUFFER_SIZE
 # define BUFFER_SIZE 1024
@@ -59,38 +56,10 @@
 #define BIG_SIG1(x) (ROTRIGHT(x, 6) ^ ROTRIGHT(x, 11) ^ ROTRIGHT(x, 25))
 
 
-/*=============== STRUCTURES ===========*/
-
-typedef enum {
-	INPUT_STDIN,
-	INPUT_STRING,
-	INPUT_FILE
-}               t_input_type;
-
-typedef struct s_input {
-	t_input_type    type;
-	char            *data;
-	struct s_input  *next;
-}               t_input;
-
-typedef struct s_flags {
-	int     p;
-	int     q;
-	int     r;
-	int     s;
-}           t_flags;
-
-typedef struct s_context {
-	t_flags     flags;
-	t_input     *inputs;
-	char         *type;
-}               t_context;
-
-
 /*=============== MAIN ===========*/
 
 void	process_input(t_context *ctx);
-char	*run_hash(const char *type, const char *input);
+char	*run_hash(const char *type, t_context *ctx);
 
 /*=============== PARSER ===========*/
 
@@ -102,14 +71,6 @@ int handle_flag_r(t_context *ctx, char **av, int *i);
 int handle_flag_p(t_context *ctx, char **av, int *i);
 int handle_flag_s(t_context *ctx, char **av, int *i);
 
-/*=============== UTILS ===========*/
-
-int		ft_strcmp(const char *s1, const char *s2);
-void	print_str(const char *s);
-void	*ft_calloc(size_t count, size_t size);
-void	free_context(t_context *ctx);
-void	ft_memcpy(void *dst, const void *src, size_t n);
-size_t	ft_strlen(const char *s);
 
 /*=============== READER ===========*/
 
@@ -119,19 +80,19 @@ char	*read_file(const char *filename);
 /*================ MD5 =============*/
 
 uint8_t	*md5_pad(const uint8_t *msg, size_t len, size_t *new_len_out);
-char	*md5_hash(const char *input);
+char	*md5_hash(t_context *ctx);
 char	*md5_format_result(uint32_t A, uint32_t B, uint32_t C, uint32_t D);
 
 /*================ SHA256 =============*/
 
 uint8_t	*sha_pad(const uint8_t *msg, size_t len, size_t *padded_len_out);
-char	*sha256_hash(const char *input);
+char	*sha256_hash(t_context *ctx);
 char	*sha256_format_result(uint32_t H[8]);
 
 
 /*==================== FUNCTIONS PTR ======================*/
 
-typedef char *(*t_hash_fn)(const char *input);
+typedef char *(*t_hash_fn)(t_context *ctx);
 
 typedef struct s_hash_dispatch {
 	const char  *name;
@@ -141,7 +102,25 @@ typedef struct s_hash_dispatch {
 static const t_hash_dispatch g_hashes[] = {
 	{ "md5", md5_hash },
 	{ "sha256", sha256_hash },
+	{ "base64", base64_process },
 	{ NULL, NULL }
+};
+
+typedef int (*t_parser_fn)(t_context *ctx, int ac, char **av);
+
+typedef struct s_command {
+	const char      *name;
+	t_hash_fn        func;
+	t_parser_fn      parser;
+	int              needs_inputs;
+}	t_command;
+
+static const t_command g_commands[] = {
+	{ "md5", md5_hash, parse_args, 1 },
+	{ "sha256", sha256_hash, parse_args, 1 },
+	{ "base64", base64_process, parse_base64_args, 0 },
+	// { "des-cbc", des_cbc_process, parse_des_args, 0 }, à venir
+	{ NULL, NULL, NULL, 0 }
 };
 
 typedef int (*t_flag_handler)(t_context *ctx, char **av, int *i);

@@ -6,7 +6,7 @@
 /*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 11:53:12 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/25 13:47:27 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/08/26 18:19:26 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,27 @@ void ft_memcpy(void *dest, const void *src, size_t n)
 		d[i] = s[i];
 }
 
+void    *ft_memset(void *b, int c, size_t len)
+{
+    unsigned char *p = b;
+    while (len--)
+        *p++ = (unsigned char)c;
+    return b;
+}
+
 size_t ft_strlen(const char *s)
 {
 	size_t len = 0;
 	while (s[len])
 		len++;
 	return len;
+}
+void write_file(const char *filename, const char *data) {
+	int fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (fd < 0) {
+		perror("open");
+		return;
+	}
+	write(fd, data, strlen(data));
+	close(fd);
 }

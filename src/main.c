@@ -3,23 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 11:09:41 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/26 11:14:40 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/08/26 18:17:56 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ssl_md5.h"
 
-char	*run_hash(const char *type, const char *input)
+char	*run_hash(const char *type, t_context *ctx)
 {
-	if (!input || !type)
+	if (!ctx || !type)
 		return NULL;
 
 	for (int i = 0; g_hashes[i].name; i++) {
 		if (strcmp(type, g_hashes[i].name) == 0)
-			return g_hashes[i].func(input);
+			return g_hashes[i].func(ctx);
 	}
 	return NULL;
 }
@@ -33,7 +33,10 @@ static void handle_file(t_context *ctx, t_input *cur)
 		write(2, ": No such file or directory\n", 29);
 		return;
 	}
-	char *hash = run_hash(ctx->type, input_data);
+
+	ctx->inputs->data = input_data;
+
+	char *hash = run_hash(ctx->type, ctx);
 
 	if (ctx->flags.q)
 		printf("%s\n", hash);
@@ -49,7 +52,8 @@ static void handle_file(t_context *ctx, t_input *cur)
 static void handle_string(t_context *ctx, t_input *cur)
 {
 	char *input_data = cur->data;
-	char *hash = run_hash(ctx->type, input_data);
+	ctx->inputs->data = input_data;
+	char *hash = run_hash(ctx->type, ctx);
 
 	if (ctx->flags.q)
 		printf("%s\n", hash);
@@ -66,7 +70,8 @@ static void handle_stdin(t_context *ctx)
 	char *input_data = read_stdin();
 	if (ctx->flags.p)
 		write(1, input_data, ft_strlen(input_data));
-	char *hash = run_hash(ctx->type, input_data);
+	ctx->inputs->data = input_data;
+	char *hash = run_hash(ctx->type, ctx);
 
 	if (ctx->flags.q)
 		printf("%s\n", hash);
@@ -94,43 +99,53 @@ void	process_input(t_context *ctx)
 	}
 }
 
-
 int main(int ac, char **av)
 {
-	if (ac < 2 || (ft_strcmp(av[1], "md5") != 0 && ft_strcmp(av[1], "sha256") != 0))
-	{
+	if (ac < 2) {
 		write(2, "usage: ft_ssl command [command opts] [command args]\n", 53);
-		return (1);
+		return 1;
 	}
-	
+
 	t_context *ctx = malloc(sizeof(t_context));
 	if (!ctx)
-		return (1);
-	ctx->flags.p = 0;
-	ctx->flags.q = 0;
-	ctx->flags.r = 0;
-	ctx->flags.s = 0;
-	ctx->inputs = NULL;
-	if (ft_strcmp(av[1], "md5") == 0)
-		ctx->type = "md5";
-	else if (ft_strcmp(av[1], "sha256") == 0)
-		ctx->type = "sha256";
-	else
-	{
+		return 1;
+
+	ft_memset(ctx, 0, sizeof(t_context)); // clean init
+	ctx->ac = ac;
+	ctx->av = av;
+
+	const t_command *cmd = NULL;
+	for (int i = 0; g_commands[i].name; i++) {
+		if (!ft_strcmp(av[1], g_commands[i].name)) {
+			cmd = &g_commands[i];
+			break;
+		}
+	}
+
+	if (!cmd) {
 		write(2, "ft_ssl: Error: Invalid command\n", 31);
-		return (1);
+		free(ctx);
+		return 1;
 	}
-	
-	if (parse_args(ctx, ac, av) != 0) {
+
+	ctx->type = (char *)cmd->name;
+
+	if (cmd->parser && cmd->parser(ctx, ac, av) != 0) {
 		free_context(ctx);
-		return (1);
+		return 1;
 	}
 
-	// print_inputs(ctx);
-
-	process_input(ctx);
+	if (cmd->needs_inputs)
+		process_input(ctx);
+	else {
+		char *output = cmd->func(ctx);
+		if (output) {
+			write(1, output, ft_strlen(output));
+			write(1, "\n", 1);
+			free(output);
+		}
+	}
 
 	free_context(ctx);
-
 	return 0;
 }
