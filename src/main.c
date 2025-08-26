@@ -3,84 +3,93 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 11:09:41 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/25 17:40:42 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/08/26 11:14:40 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ssl_md5.h"
 
-char	*run_hash(const char *type, const char *input) {
-    if (!input)
-        return NULL;
-    if (strcmp(type, "md5") == 0)
-        return md5_hash(input);
-    else if (strcmp(type, "sha256") == 0)
-        return sha256_hash(input);
-    return NULL;
+char	*run_hash(const char *type, const char *input)
+{
+	if (!input || !type)
+		return NULL;
+
+	for (int i = 0; g_hashes[i].name; i++) {
+		if (strcmp(type, g_hashes[i].name) == 0)
+			return g_hashes[i].func(input);
+	}
+	return NULL;
+}
+
+static void handle_file(t_context *ctx, t_input *cur)
+{
+	char *input_data = read_file(cur->data);
+	if (!input_data) {
+		write(2, "ft_ssl: ", 8);
+		write(2, cur->data, ft_strlen(cur->data));
+		write(2, ": No such file or directory\n", 29);
+		return;
+	}
+	char *hash = run_hash(ctx->type, input_data);
+
+	if (ctx->flags.q)
+		printf("%s\n", hash);
+	else if (ctx->flags.r)
+		printf("%s %s\n", hash, cur->data);
+	else
+		printf("%s (%s) = %s\n", ctx->type, cur->data, hash);
+
+	free(input_data);
+	free(hash);
+}
+
+static void handle_string(t_context *ctx, t_input *cur)
+{
+	char *input_data = cur->data;
+	char *hash = run_hash(ctx->type, input_data);
+
+	if (ctx->flags.q)
+		printf("%s\n", hash);
+	else if (ctx->flags.r)
+		printf("%s \"%s\"\n", hash, input_data);
+	else
+		printf("%s (\"%s\") = %s\n", ctx->type, input_data, hash);
+
+	free(hash);
+}
+
+static void handle_stdin(t_context *ctx)
+{
+	char *input_data = read_stdin();
+	if (ctx->flags.p)
+		write(1, input_data, ft_strlen(input_data));
+	char *hash = run_hash(ctx->type, input_data);
+
+	if (ctx->flags.q)
+		printf("%s\n", hash);
+	else if (ctx->flags.r)
+		printf("%s %s\n", hash, input_data);
+	else
+		printf("(\"%s\")= %s\n", input_data, hash);
+
+	free(input_data);
+	free(hash);
 }
 
 void	process_input(t_context *ctx)
 {
 	t_input *cur = ctx->inputs;
-	
+
 	while (cur) {
-		char *input_data = NULL;
-
-		if (cur->type == INPUT_STDIN) {
-			input_data = read_stdin();
-			char *hash = run_hash(ctx->type, input_data);
-
-			if (ctx->flags.q == 1) {
-				printf("%s\n", hash);
-			} else if (ctx->flags.r == 1) {
-				printf("%s %s\n", hash, input_data);
-			} else if (ctx->flags.p == 1) {
-				printf("%s (\"%s\") = %s\n", ctx->type, input_data, hash);
-			} else {
-				printf("(stdin)= %s\n", hash);
-			}
-			if (input_data)
-				free(input_data);
-			if (hash)
-				free(hash);
-		} else if (cur->type == INPUT_STRING) {
-			input_data = cur->data;
-			char *hash = run_hash(ctx->type, input_data);
-
-			if (ctx->flags.q == 1) {
-				printf("%s\n", hash);
-			} else if (ctx->flags.r == 1) {
-				printf("%s \"%s\"\n", hash, input_data);
-			} else {
-				printf("%s (\"%s\") = %s\n", ctx->type, input_data, hash);
-			}
-			if (hash)
-				free(hash);
-			
-		} else if (cur->type == INPUT_FILE) {
-			input_data = read_file(cur->data);
-			char *hash = run_hash(ctx->type, input_data);
-			if (!input_data) {
-				printf("ft_ssl: %s: No such file or directory\n", cur->data);
-				cur = cur->next;
-				continue;
-			}
-
-			if (ctx->flags.q == 1) {
-				printf("%s\n", hash);
-			} else if (ctx->flags.r == 1) {
-				printf("%s %s\n", hash, cur->data);
-			} else {
-				printf("%s (%s) = %s\n", ctx->type, cur->data, hash);
-			}
-			if (input_data)
-				free(input_data);
-			if (hash)
-				free(hash);
-		}
+		if (cur->type == INPUT_STDIN)
+			handle_stdin(ctx);
+		else if (cur->type == INPUT_STRING)
+			handle_string(ctx, cur);
+		else if (cur->type == INPUT_FILE)
+			handle_file(ctx, cur);
 		cur = cur->next;
 	}
 }
