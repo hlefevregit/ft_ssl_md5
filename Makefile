@@ -23,15 +23,19 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJS)
+	printf "$(GREEN)$(NAME) compiled successfully!$(RESET) 💾\n"
+	
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -f $(OBJS)
+	printf "$(YELLOW)Object files removed!$(RESET) 🗑️\n"
 
 fclean: clean
 	rm -f $(NAME)
+	printf "$(RED)$(NAME) removed!$(RESET) 🗑️\n"
 
 re: fclean all
 
@@ -39,3 +43,12 @@ re: fclean all
 .SILENT:
 
 .PHONY: all clean fclean re
+
+RED = \033[0;31m
+GREEN = \033[0;32m
+YELLOW = \033[0;33m
+BLUE = \033[0;34m
+MAGENTA = \033[0;35m
+CYAN = \033[0;36m
+WHITE = \033[0;37m
+RESET = \033[0m
