@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_ssl_md5.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 11:05:09 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/26 18:16:34 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/08/28 17:29:28 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ char	*run_hash(const char *type, t_context *ctx);
 
 int		parse_args(t_context *ctx, int ac, char **av);
 void	print_inputs(t_context *ctx);
+void	add_input(t_context *ctx, t_input_type type, char *data);
 
 int handle_flag_q(t_context *ctx, char **av, int *i);
 int handle_flag_r(t_context *ctx, char **av, int *i);

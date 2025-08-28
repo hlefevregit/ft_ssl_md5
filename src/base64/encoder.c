@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   encoder.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 17:07:09 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/26 17:16:44 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/08/28 17:58:16 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ static const uint8_t decode_table[256] = {
 	['+'] = 62, ['/'] = 63
 };
 
-char	*base64_decode(const char *input)
+char	*base64_decode(const char *input, size_t *decoded_len)
 {
 	if (!input)
 		return NULL;
@@ -37,22 +37,27 @@ char	*base64_decode(const char *input)
 	if (input_len % 4 != 0)
 		return NULL;
 
-	size_t output_len = (input_len / 4) * 3;
+	*decoded_len = (input_len / 4) * 3;
 
-	if (input_len >=1 && input[input_len - 1] == '=')
-		output_len--;
-	if (input_len >=2 && input[input_len - 2] == '=')
-		output_len--;
+	if (input_len >= 1 && input[input_len - 1] == '=')
+		(*decoded_len)--;
+	if (input_len >= 2 && input[input_len - 2] == '=')
+		(*decoded_len)--;
 
-	char *output = (char *)malloc(output_len + 1);
-
+	char *output = malloc(*decoded_len);
 	if (!output)
 		return NULL;
+
 
 	size_t i = 0, j = 0;
 
 	while (i < input_len)
 	{
+		if (input[i] != '=' && decode_table[(unsigned char)input[i]] == 0 && input[i] != 'A') {
+			write(2, "ft_ssl: base64: Invalid base64 input\n", 37);
+			free(output);
+			return NULL;
+		}
 		uint32_t sextet_a = input[i] == '=' ? 0 & i++ : decode_table[(unsigned char)input[i++]];
 		uint32_t sextet_b = input[i] == '=' ? 0 & i++ : decode_table[(unsigned char)input[i++]];
 		uint32_t sextet_c = input[i] == '=' ? 0 & i++ : decode_table[(unsigned char)input[i++]];
@@ -60,9 +65,9 @@ char	*base64_decode(const char *input)
 
 		uint32_t triple = (sextet_a << 18) | (sextet_b << 12) | (sextet_c << 6) | sextet_d;
 
-		if (j < output_len) output[j++] = (triple >> 16) & 0xFF;
-		if (j < output_len) output[j++] = (triple >> 8) & 0xFF;
-		if (j < output_len) output[j++] = triple & 0xFF;
+		if (j < *decoded_len) output[j++] = (triple >> 16) & 0xFF;
+		if (j < *decoded_len) output[j++] = (triple >> 8) & 0xFF;
+		if (j < *decoded_len) output[j++] = triple & 0xFF;
 	}
 
 	output[j] = '\0';

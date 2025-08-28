@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_ssl_des.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 16:27:46 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/26 17:53:44 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/08/28 17:57:03 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 // Fonctions base64
 char	*base64_encode(const char *input);
-char	*base64_decode(const char *input);
+char	*base64_decode(const char *input, size_t *decoded_len);
 
 char	*base64_process(t_context *ctx);
 int		parse_base64_args(t_context *ctx, int ac, char **av);

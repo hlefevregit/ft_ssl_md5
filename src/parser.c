@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 11:51:57 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/26 18:20:58 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/08/28 18:09:28 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,49 +34,59 @@ void	add_input(t_context *ctx, t_input_type type, char *data)
 
 }
 
-int handle_flag_q(t_context *ctx, char **av, int *i)
-{
-	(void)av;
-	(void)i;
-	ctx->flags.q = 1;
-	return 0;
-}
 
-int handle_flag_r(t_context *ctx, char **av, int *i)
-{
-	(void)av;
-	(void)i;
-	ctx->flags.r = 1;
-	return 0;
-}
 
-int handle_flag_p(t_context *ctx, char **av, int *i)
-{
-	(void)av;
-	(void)i;
-	ctx->flags.p = 1;
-	add_input(ctx, INPUT_STDIN, NULL);
-	return 0;
-}
 
-int handle_flag_s(t_context *ctx, char **av, int *i)
+int parse_base64_args(t_context *ctx, int ac, char **av)
 {
-	if (++(*i) >= 0 && av[*i] && av[*i][0] != '-') {
-		add_input(ctx, INPUT_STRING, av[*i]);
-		return 0;
+	int i = 2;
+	int has_input = 0;
+
+	ctx->b64_flags.encode = 1;
+
+	while (i < ac) {
+		if (!strcmp(av[i], "-d"))
+			ctx->b64_flags.encode = 0;
+		else if (!strcmp(av[i], "-e"))
+			ctx->b64_flags.encode = 1;
+		else if (!strcmp(av[i], "-i")) {
+			if (++i >= ac) {
+				write(2, "ft_ssl: base64: missing input file\n", 35);
+				return 1;
+			}
+			ctx->b64_flags.infile = av[i];
+			has_input = 1;
+		}
+		else if (!strcmp(av[i], "-o")) {
+			if (++i >= ac || av[i][0] == '-') {
+				write(2, "ft_ssl: base64: missing output file\n", 36);
+				return 1;
+			}
+			ctx->b64_flags.outfile = av[i];
+		}
+		else {
+			write(2, "ft_ssl: base64: invalid option: ", 32);
+			write(2, av[i], strlen(av[i]));
+			write(2, "\n", 1);
+			return 1;
+		}
+		i++;
 	}
-	write(2, "ft_ssl: ", 8);
-	write(2, ctx->type, ft_strlen(ctx->type));
-	write(2, ": -s: No such file or directory\n", 32);
-	return 1;
+
+	// Si aucun fichier input ET stdin est un terminal => rien à lire
+	if (!has_input && isatty(STDIN_FILENO)) {
+		write(2, "usage: ft_ssl base64 [-e|-d] [-i file] [-o file]\n", 49);
+		return 1;
+	}
+
+	return 0;
 }
-
-
 
 int	parse_args(t_context *ctx, int ac, char **av)
 {
 	int i = 2;
 	int saw_stdin = 0;
+	int saw_valid_input = 0;
 	if (ft_strcmp(ctx->type, "sha256") == 0 || ft_strcmp(ctx->type, "md5") == 0) {
 		while (i < ac) {
 			int matched = 0;
@@ -88,6 +98,7 @@ int	parse_args(t_context *ctx, int ac, char **av)
 						return 1;
 					if (!ft_strcmp(av[i], "-p"))
 						saw_stdin = 1;
+					saw_valid_input = 1;
 					matched = 1;
 					break;
 				}
@@ -102,15 +113,21 @@ int	parse_args(t_context *ctx, int ac, char **av)
 					return 1;
 				}
 				add_input(ctx, INPUT_FILE, av[i]);
+				saw_valid_input = 1;
 			}
 			i++;
 		}
+		if (!saw_valid_input && !saw_stdin) {
+			write(2, "usage: ft_ssl ", 14);
+			write(2, ctx->type, ft_strlen(ctx->type));
+			write(2, " [flags] [file/string]\n", 24);
+			return 1;
+		}
+
 		if (!ctx->inputs && !saw_stdin)
 			add_input(ctx, INPUT_STDIN, NULL);
 	} 
-	// printf("encode: %d\n", ctx->b64_flags.encode);
-	// printf("infile: %s\n", ctx->b64_flags.infile);
-	// printf("outfile: %s\n", ctx->b64_flags.outfile);
+
 	return 0;
 }
 
