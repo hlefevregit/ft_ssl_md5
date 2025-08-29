@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 11:09:41 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/28 18:13:41 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/08/29 10:40:41 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,13 @@ void	print_usage(const char *invalid)
 	write(2, "Flags:\n-p -q -r -s\n", 19);
 }
 
-char	*run_hash(const char *type, t_context *ctx)
+char	*run_hash(const char *type, t_context *ctx, const char *data)
 {
-	if (!ctx || !type)
+	if (!ctx || !type || !data)
 		return NULL;
+
+	// Expose temporairement la donnée dans ctx pour compatibilité
+	ctx->inputs->data = (char *)data;
 
 	for (int i = 0; g_hashes[i].name; i++) {
 		if (strcmp(type, g_hashes[i].name) == 0)
@@ -39,45 +42,42 @@ char	*run_hash(const char *type, t_context *ctx)
 	return NULL;
 }
 
+
 static void handle_file(t_context *ctx, t_input *cur)
 {
 	char *input_data = read_file(cur->data);
 	if (!input_data) {
 		write(2, "ft_ssl: ", 8);
-		write(2, cur->data, ft_strlen(cur->data)); // cur->data est le nom du fichier (ex: "e")
+		write(2, cur->data, ft_strlen(cur->data));
 		write(2, ": No such file or directory\n", 29);
 		return;
 	}
 
-	// Associe les données à cur->data pour les fonctions de hash
-	cur->data = input_data;
-
-	char *hash = run_hash(ctx->type, ctx);
+	char *hash = run_hash(ctx->type, ctx, input_data);
 
 	if (ctx->flags.q)
 		printf("%s\n", hash);
 	else if (ctx->flags.r)
-		printf("%s %s\n", hash, ctx->inputs->next ? ctx->inputs->next->data : "(stdin)");
+		printf("%s %s\n", hash, cur->data);
 	else
-		printf("%s (%s) = %s\n", ctx->type, ctx->inputs->next ? ctx->inputs->next->data : "(stdin)", hash);
+		printf("%s (%s) = %s\n", ctx->type, cur->data, hash);
 
 	free(input_data);
 	free(hash);
 }
 
 
+
 static void handle_string(t_context *ctx, t_input *cur)
 {
-	char *input_data = cur->data;
-	ctx->inputs->data = input_data;
-	char *hash = run_hash(ctx->type, ctx);
+	char *hash = run_hash(ctx->type, ctx, cur->data);
 
 	if (ctx->flags.q)
 		printf("%s\n", hash);
 	else if (ctx->flags.r)
-		printf("%s \"%s\"\n", hash, input_data);
+		printf("%s \"%s\"\n", hash, cur->data);
 	else
-		printf("%s (\"%s\") = %s\n", ctx->type, input_data, hash);
+		printf("%s (\"%s\") = %s\n", ctx->type, cur->data, hash);
 
 	free(hash);
 }
@@ -85,10 +85,13 @@ static void handle_string(t_context *ctx, t_input *cur)
 static void handle_stdin(t_context *ctx)
 {
 	char *input_data = read_stdin();
+	if (!input_data)
+		return;
+
 	if (ctx->flags.p)
 		write(1, input_data, ft_strlen(input_data));
-	ctx->inputs->data = input_data;
-	char *hash = run_hash(ctx->type, ctx);
+
+	char *hash = run_hash(ctx->type, ctx, input_data);
 
 	if (ctx->flags.q)
 		printf("%s\n", hash);
@@ -100,6 +103,7 @@ static void handle_stdin(t_context *ctx)
 	free(input_data);
 	free(hash);
 }
+
 
 void	process_input(t_context *ctx)
 {
@@ -148,6 +152,13 @@ int	main(int ac, char **av)
 	if (cmd->parser && cmd->parser(ctx, ac, av) != 0) {
 		free_context(ctx);
 		return 1;
+	}
+
+	if (!ft_strncmp(ctx->type, "des-", 4)) {
+		if (prepare_des_crypt_params(ctx) != 0) {
+			free_context(ctx);
+			return 1;
+		}
 	}
 
 	if (cmd->needs_inputs)

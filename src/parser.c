@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 11:51:57 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/28 18:09:28 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/08/29 10:28:48 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,36 @@ void	add_input(t_context *ctx, t_input_type type, char *data)
 
 }
 
+
+int	parse_des_args(t_context *ctx, int ac, char **av)
+{
+	int i = 2;
+
+	// Par défaut on chiffre
+	ctx->des_flags.encrypt = 1;
+
+	while (i < ac) {
+		int matched = 0;
+
+		for (int j = 0; g_des_flags[j].flag; j++) {
+			if (!strcmp(av[i], g_des_flags[j].flag)) {
+				if (g_des_flags[j].handler(ctx, av, &i))
+					return 1;
+				matched = 1;
+				break;
+			}
+		}
+
+		if (!matched) {
+			write(2, "ft_ssl des: invalid option: ", 28);
+			write(2, av[i], strlen(av[i]));
+			write(2, "\n", 1);
+			return 1;
+		}
+		i++;
+	}
+	return 0;
+}
 
 
 

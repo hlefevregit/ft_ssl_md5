@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 11:05:09 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/28 17:29:28 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/08/29 10:29:12 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@
 /*=============== MAIN ===========*/
 
 void	process_input(t_context *ctx);
-char	*run_hash(const char *type, t_context *ctx);
+char	*run_hash(const char *type, t_context *ctx, const char *data);
 
 /*=============== PARSER ===========*/
 
@@ -120,7 +120,8 @@ static const t_command g_commands[] = {
 	{ "md5", md5_hash, parse_args, 1 },
 	{ "sha256", sha256_hash, parse_args, 1 },
 	{ "base64", base64_process, parse_base64_args, 0 },
-	// { "des-cbc", des_cbc_process, parse_des_args, 0 }, à venir
+	{ "des-cbc", des_cbc_process, parse_des_args, 0 },
+	{ "des-ecb", des_ecb_process, parse_des_args, 0 },
 	{ NULL, NULL, NULL, 0 }
 };
 
