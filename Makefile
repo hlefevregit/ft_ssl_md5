@@ -16,7 +16,15 @@ SRCS        := ./src/main.c \
 			./src/sha256/result.c \
 			./src/base64/encoder.c \
 			./src/base64/process.c \
-			./src/flags.c
+			./src/flags.c \
+			./src/des/args_process.c \
+			./src/des/process.c \
+			./src/des/ecb/process.c \
+			./src/des/ecb/padding.c \
+			./src/des/ecb/encrypter.c \
+			./src/des/ecb/schedule.c \
+			# ./src/des/cbc/process.c \
+
 
 OBJS        := $(SRCS:.c=.o)
 

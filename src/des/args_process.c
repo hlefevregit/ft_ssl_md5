@@ -6,14 +6,44 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/29 10:33:50 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/08/29 11:23:16 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/08/29 16:29:34 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/ft_ssl_md5.h"
 #include "../../includes/ft_types.h"
 
-char *md5_of_buffer(const void *data, size_t len) {
+
+
+int generate_random_bytes(uint8_t *buf, size_t len)
+{
+	if (!buf || len == 0)
+		return 1;
+
+	int fd = open("/dev/urandom", O_RDONLY);
+	if (fd < 0)
+		return 1;
+
+	ssize_t read_len = read(fd, buf, len);
+	close(fd);
+
+	if (read_len != (ssize_t)len)
+		return 1;
+
+	return 0;
+}
+
+
+void print_hex(uint8_t *buf, size_t len)
+{
+    char hex[3];
+    for (size_t i = 0; i < len; ++i) {
+        snprintf(hex, sizeof(hex), "%02X", buf[i]);
+        write(1, hex, 2);
+    }
+}
+
+char *md5_hash_buffer(const void *data, size_t len) {
 	t_context ctx;
 	ft_memset(&ctx, 0, sizeof(t_context));
 
@@ -33,46 +63,61 @@ char *md5_of_buffer(const void *data, size_t len) {
 	return digest_str;
 }
 
-static void	derive_key_iv_from_password(t_context *ctx)
+int derive_key_iv_from_password(t_context *ctx)
 {
-	unsigned char	buffer[MD5_DIGEST_LENGTH * 2];
-	unsigned char	*password = (unsigned char *)ctx->des_flags.password;
-	unsigned char	salt[8];
-	
-	if (ctx->des_flags.salt_hex) {
-		if (hexstr_to_bytes(ctx->des_flags.salt_hex, salt, 8) != 0) {
-			write(2, "ft_ssl des: invalid salt format\n", 32);
-			return;
-		}
-	} else {
-		for (int i = 0; i < 8; i++)
-			salt[i] = rand() % 256;
+	t_des_flags *params = &ctx->des_flags;
 
-		memcpy(ctx->des_flags.salt, salt, 8);
-		
+	if (params->has_key)
+		return 0;
+
+	if (!params->password) {
+		write(2, "ft_ssl des: no key or password provided\n", 40);
+		return 1;
 	}
 
-	uint8_t md5_input[512];
-	int pass_len = ft_strlen((char *)password);
-	
-	ft_memcpy(md5_input, password, pass_len);
-	ft_memcpy(md5_input + pass_len, salt, 8);
-	
-	unsigned char digest1[MD5_DIGEST_LENGTH];
-	md5_hash_buffer(md5_input, pass_len + 8, digest1);
-	
-	ft_memcpy(ctx->des_flags.key, digest1, 8);
-	
-	ft_memcpy(md5_input, digest1, MD5_DIGEST_LENGTH);
-	ft_memcpy(md5_input + MD5_DIGEST_LENGTH, password, pass_len);
-	ft_memcpy(md5_input + MD5_DIGEST_LENGTH + pass_len, salt, 8);
-	
-	unsigned char digest2[MD5_DIGEST_LENGTH];
-	md5_hash_buffer(md5_input, MD5_DIGEST_LENGTH + pass_len + 8, digest2);
+	// Generate salt if not provided
+	if (!params->has_salt) {
+		if (generate_random_bytes(params->salt, 8) != 0) {
+			write(2, "ft_ssl des: failed to generate salt\n", 36);
+			return 1;
+		}
+		params->has_salt = 1;
+	}
 
-	ft_memcpy(ctx->des_flags.iv, digest2, 8);
+	// Concat password + salt
+	size_t pwd_len = ft_strlen(params->password);
+	unsigned char *concat = malloc(pwd_len + 8);
+	if (!concat)
+		return 1;
+	ft_memcpy(concat, params->password, pwd_len);
+	ft_memcpy(concat + pwd_len, params->salt, 8);
+
+	// MD5(password + salt)
+	t_context tmp_ctx = {0};
+	t_input input = { .type = INPUT_STRING, .data = (char *)concat, .next = NULL };
+	tmp_ctx.inputs = &input;
+	tmp_ctx.type = "md5";
+
+	char *digest_hex = md5_hash(&tmp_ctx);
+	free(concat);
+
+	if (!digest_hex)
+		return 1;
+
+	uint8_t digest[16];
+	if (hexstr_to_bytes(digest_hex, digest, 16) != 0) {
+		free(digest_hex);
+		return 1;
+	}
+	free(digest_hex);
+
+	ft_memcpy(params->key, digest, 8);
+	ft_memcpy(params->iv, digest + 8, 8);
+	params->has_key = 1;
+	params->has_iv = 1;
+
+	return 0;
 }
-
 
 int	prepare_des_crypt_params(t_context *ctx)
 {
@@ -109,6 +154,15 @@ int	prepare_des_crypt_params(t_context *ctx)
 			write(2, "ft_ssl des: invalid IV format\n", 30);
 			return 1;
 		}
+	}
+	if (ctx->des_flags.print_key) {
+		write(1, "salt=", 5);
+		print_hex(ctx->des_flags.salt, 8);
+		write(1, "\nkey=", 5);
+		print_hex(ctx->des_flags.key, 8);
+		write(1, "\niv=", 4);
+		print_hex(ctx->des_flags.iv, 8);
+		write(1, "\n", 1);
 	}
 	return 0;
 }

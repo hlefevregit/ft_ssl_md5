@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 11:53:12 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/29 11:39:06 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/08/29 16:13:20 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,59 +103,6 @@ int ft_isalpha(int c)
 int ft_isupper(int c)
 {
 	return (c >= 'A' && c <= 'Z');
-}
-
-long    ft_strtol(const char *nptr, char **endptr, int base)
-{
-	const char *s = nptr;
-	unsigned long acc = 0;
-	int c;
-	int neg = 0, any = 0, cutoff, cutlim;
-
-	while (ft_isspace((unsigned char)*s))
-		s++;
-	if (*s == '-') {
-		neg = 1;
-		s++;
-	} else if (*s == '+')
-		s++;
-	if ((base == 0 || base == 16) &&
-		s[0] == '0' && (s[1] == 'x' || s[1] == 'X')) {
-		s += 2;
-		base = 16;
-	}
-	if (base == 0)
-		base = s[0] == '0' ? 8 : 10;
-
-	cutoff = neg ? -(LONG_MIN / base) : LONG_MAX / base;
-	cutlim = neg ? -(LONG_MIN % base) : LONG_MAX % base;
-
-	for (; ; s++) {
-		c = (unsigned char)*s;
-		if (isdigit(c))
-			c -= '0';
-		else if (ft_isalpha(c))
-			c -= ft_isupper(c) ? 'A' - 10 : 'a' - 10;
-		else
-			break;
-		if (c >= base)
-			break;
-		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
-			any = -1;
-		else {
-			any = 1;
-			acc *= base;
-			acc += c;
-		}
-	}
-	if (any < 0) {
-		acc = neg ? LONG_MIN : LONG_MAX;
-		errno = ERANGE;
-	} else if (neg)
-		acc = -acc;
-	if (endptr)
-		*endptr = (char *)(any ? s : nptr);
-	return acc;
 }
 
 int	ft_hexchar_to_val(char c)

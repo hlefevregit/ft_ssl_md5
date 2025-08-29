@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 16:27:46 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/29 11:21:46 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/08/29 18:18:13 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,23 @@ int		parse_base64_args(t_context *ctx, int ac, char **av);
 int		parse_des_args(t_context *ctx, int ac, char **av);
 
 int		prepare_des_crypt_params(t_context *ctx);
+
+/////// Fonctions DES
+
+size_t	pad_data(uint8_t **data, size_t len, size_t block_size);
+
+char	*des_cbc_process(t_context *ctx);
+// char	*des_ecb_process(t_context *ctx);
+void	des_encrypt_block(uint8_t in[8], uint8_t out[8], uint8_t key[8], uint8_t iv[8]);
+void	des_decrypt_block(const uint8_t *in, uint8_t *out, const uint8_t *key, const uint8_t *iv);
+
+
+/**************** ECB *****************/
+
+static uint64_t permute(uint64_t input, const int *table, int out_bits, int in_bits);
+uint64_t initial_permutation(uint64_t input);
+void des_key_schedule(const uint8_t key[8], uint64_t subkeys[16]);
+void des_decrypt_block(const uint8_t *in, uint8_t *out, const uint8_t *key, const uint8_t *iv);
 
 
 /*================FLAGS ============*/

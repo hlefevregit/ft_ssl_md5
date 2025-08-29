@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 17:24:58 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/08/29 11:21:53 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/08/29 16:14:02 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,7 @@ int handle_b64_o(t_context *ctx, char **av, int *i)
 int handle_des_flag_d(t_context *ctx, char **av, int *i)
 {
 	(void)av;
+	(void)i;
 	ctx->des_flags.encrypt = 0;
 	return 0;
 }
@@ -109,6 +110,7 @@ int handle_des_flag_d(t_context *ctx, char **av, int *i)
 int handle_des_flag_e(t_context *ctx, char **av, int *i)
 {
 	(void)av;
+	(void)i;
 	ctx->des_flags.encrypt = 1;
 	return 0;
 }
@@ -116,6 +118,7 @@ int handle_des_flag_e(t_context *ctx, char **av, int *i)
 int handle_des_flag_a(t_context *ctx, char **av, int *i)
 {
 	(void)av;
+	(void)i;
 	ctx->des_flags.base64 = 1;
 	return 0;
 }

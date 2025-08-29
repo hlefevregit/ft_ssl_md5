@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 11:09:41 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/29 10:40:41 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/08/29 14:09:40 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,12 +154,13 @@ int	main(int ac, char **av)
 		return 1;
 	}
 
-	if (!ft_strncmp(ctx->type, "des-", 4)) {
-		if (prepare_des_crypt_params(ctx) != 0) {
-			free_context(ctx);
-			return 1;
-		}
-	}
+	// if (!ft_strncmp(ctx->type, "des-", 4)) {
+	// 	if (prepare_des_crypt_params(ctx) != 0) {
+	// 		free_context(ctx);
+	// 		return 1;
+	// 	}
+		
+	// }
 
 	if (cmd->needs_inputs)
 		process_input(ctx);
