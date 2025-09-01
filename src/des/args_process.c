@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   args_process.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/29 10:33:50 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/08/29 16:29:34 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/09/01 16:38:37 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,8 +127,8 @@ int	prepare_des_crypt_params(t_context *ctx)
 			return 1;
 		}
 	} else if (ctx->des_flags.password) {
-		derive_key_iv_from_password(ctx);
-	
+		if (derive_key_iv_from_password(ctx))
+			return 1;
 	} else if (!ctx->des_flags.password) {
 		if (ctx->des_flags.print_key) {
 			char *pwd1 = getpass("Enter password: ");

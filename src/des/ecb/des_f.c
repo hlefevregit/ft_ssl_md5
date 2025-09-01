@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   des_f.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/29 18:17:06 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/08/29 18:18:28 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/09/01 16:30:38 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "../../../includes/ft_ssl_des.h"
 
 // Expansion table (32 → 48 bits)
-static const int E[48] = {
+const int E[48] = {
 	32, 1, 2, 3, 4, 5,
 	4, 5, 6, 7, 8, 9,
 	8, 9,10,11,12,13,
@@ -88,6 +88,16 @@ static const int P[32] = {
 	19, 13, 30, 6,
 	22, 11, 4, 25
 };
+
+uint64_t permute(uint64_t input, const int *table, int out_bits, int in_bits)
+{
+	uint64_t output = 0;
+	for (int i = 0; i < out_bits; i++) {
+		uint64_t bit = (input >> (in_bits - table[i])) & 1;
+		output |= (bit << (out_bits - 1 - i));
+	}
+	return output;
+}
 
 uint32_t des_f(uint32_t right, uint64_t subkey)
 {

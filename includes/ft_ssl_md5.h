@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_ssl_md5.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 11:05:09 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/29 16:32:35 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/09/01 16:32:01 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,8 +120,8 @@ static const t_command g_commands[] = {
 	{ "md5", md5_hash, parse_args, 1 },
 	{ "sha256", sha256_hash, parse_args, 1 },
 	{ "base64", base64_process, parse_base64_args, 0 },
-	{ "des-cbc", des_cbc_process, parse_des_args, 0 },
-	// { "des-ecb", des_ecb_process, parse_des_args, 0 },
+	// { "des-cbc", des_cbc_process, parse_des_args, 0 },
+	{ "des-ecb", des_ecb_process, parse_des_args, 0 },
 	{ NULL, NULL, NULL, 0 }
 };
 

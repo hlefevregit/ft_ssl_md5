@@ -3,23 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   process.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/29 14:08:16 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/08/29 17:57:30 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/09/01 16:46:13 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/ft_types.h"
 #include "../../../includes/ft_ssl_md5.h"
 
-char	*des_cbc_process(t_context *ctx)
+char	*des_ecb_process(t_context *ctx)
 {
 	
 	if (prepare_des_crypt_params(ctx) != 0)
 		return NULL;
 	char *input_str = ctx->des_flags.infile ? read_file(ctx->des_flags.infile) : read_stdin();
 	
+	if (!input_str) {
+		write(2, "ft_ssl des: failed to read input\n", 33);
+		return NULL;
+	}
 	size_t len = ft_strlen(input_str);
 	uint8_t *data = malloc(len);
 	if (!data) return NULL;
