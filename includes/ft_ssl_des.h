@@ -6,7 +6,7 @@
 /*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 16:27:46 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/09/01 16:33:14 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/09/02 16:13:06 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 
 
 // Fonctions base64
-char	*base64_encode(const char *input);
+char	*base64_encode(const char *input, size_t input_len);
 char	*base64_decode(const char *input, size_t *decoded_len);
 
 char	*base64_process(t_context *ctx);
@@ -30,13 +30,13 @@ int		prepare_des_crypt_params(t_context *ctx);
 /////// Fonctions DES
 
 size_t	pad_data(uint8_t **data, size_t len, size_t block_size);
+size_t 	unpad_data(uint8_t *data, size_t len);
+void 	print_hex(uint8_t *buf, size_t len);
 
 // char	*des_cmbc_process(t_context *ctx);
 char	*des_ecb_process(t_context *ctx);
 void	des_encrypt_block(uint8_t in[8], uint8_t out[8], uint8_t key[8], uint8_t iv[8]);
-void	des_decrypt_block(const uint8_t *in, uint8_t *out, const uint8_t *key, const uint8_t *iv);
-
-
+void	des_decrypt_block(uint8_t in[8], uint8_t out[8], uint8_t key[8], uint8_t iv[8]);
 /**************** ECB *****************/
 
 extern const int E[48];
@@ -45,8 +45,6 @@ uint32_t des_f(uint32_t right, uint64_t subkey);
 uint64_t permute(uint64_t input, const int *table, int out_bits, int in_bits);
 uint64_t initial_permutation(uint64_t input);
 void des_key_schedule(const uint8_t key[8], uint64_t subkeys[16]);
-void des_decrypt_block(const uint8_t *in, uint8_t *out, const uint8_t *key, const uint8_t *iv);
-
 
 /*================FLAGS ============*/
 

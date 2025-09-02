@@ -6,7 +6,7 @@
 /*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/29 18:17:06 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/09/01 16:30:38 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/09/02 15:02:25 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ uint32_t des_f(uint32_t right, uint64_t subkey)
 	for (int i = 0; i < 8; i++) {
 		uint8_t chunk = (xored >> (42 - i * 6)) & 0x3F;
 
-		int row = ((chunk >> 5) << 1) | (chunk & 1);
+		int row = ((chunk & 0x20) >> 4) | (chunk & 0x01);
 		int col = (chunk >> 1) & 0xF;
 
 		uint8_t val = S_BOX[i][row][col];

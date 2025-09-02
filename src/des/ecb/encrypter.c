@@ -6,7 +6,7 @@
 /*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/29 17:57:20 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/09/01 16:50:49 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/09/02 16:48:00 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,16 +25,6 @@ static const uint8_t IP[64] = {
 	63, 55, 47, 39, 31, 23, 15,  7
 };
 
-// static const int E[48] = {
-// 	32, 1,  2,  3,  4,  5,
-// 	4,  5,  6,  7,  8,  9,
-// 	8,  9,  10, 11, 12, 13,
-// 	12, 13, 14, 15, 16, 17,
-// 	16, 17, 18, 19, 20, 21,
-// 	20, 21, 22, 23, 24, 25,
-// 	24, 25, 26, 27, 28, 29,
-// 	28, 29, 30, 31, 32, 1
-// };
 
 static const int IP_INV[64] = {
 	40, 8, 48, 16, 56, 24, 64, 32,
@@ -64,7 +54,7 @@ uint64_t final_permutation(uint64_t input)
 	for (int i = 0; i < 64; i++)
 	{
 		output <<= 1;
-		output |= (input >> (64 - IP_INV[63 - i])) & 0x01;
+		output |= (input >> (64 - IP_INV[i])) & 0x01;
 	}
 	return output;
 }
@@ -105,4 +95,37 @@ void des_encrypt_block(uint8_t in[8], uint8_t out[8], uint8_t key[8], uint8_t iv
 		ciphertext >>= 8;
 	}
 	
+}
+void des_decrypt_block(uint8_t in[8], uint8_t out[8], uint8_t key[8], uint8_t iv[8])
+{
+	(void)iv; // IV not used in ECB mode
+
+	uint64_t block = 0;
+	for (int i = 0; i < 8; i++) {
+		block <<= 8;
+		block |= in[i];
+	}
+
+	uint64_t subkeys[16];
+	des_key_schedule(key, subkeys);  // generate all 16 keys
+
+	block = initial_permutation(block);
+
+	uint32_t left = (block >> 32) & 0xFFFFFFFF;
+	uint32_t right = block & 0xFFFFFFFF;
+
+	for (int i = 15; i >= 0; i--) {
+		uint32_t tmp = right;
+		right = left ^ des_f(right, subkeys[i]);
+		left = tmp;
+	}
+
+	// FINAL SWAP 👇 (crucial)
+	uint64_t preoutput = ((uint64_t)right << 32) | left;
+
+	uint64_t plaintext = final_permutation(preoutput);
+	for (int i = 0; i < 8; i++) {
+		out[7 - i] = plaintext & 0xFF;
+		plaintext >>= 8;
+	}
 }

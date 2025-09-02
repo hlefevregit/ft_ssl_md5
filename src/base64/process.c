@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   process.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 16:30:43 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/28 18:07:21 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/09/02 16:12:57 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ char *base64_process(t_context *ctx)
 
 	if (ctx->b64_flags.encode)
 	{
-		output_data = base64_encode(input_data);
+		output_data = base64_encode(input_data, ft_strlen(input_data));
 	}
 	else
 	{

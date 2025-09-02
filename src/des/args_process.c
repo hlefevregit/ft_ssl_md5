@@ -6,7 +6,7 @@
 /*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/29 10:33:50 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/09/01 16:38:37 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/09/02 15:44:40 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,10 +119,42 @@ int derive_key_iv_from_password(t_context *ctx)
 	return 0;
 }
 
+static int hex_char_to_val(char c) {
+	if (c >= '0' && c <= '9') return c - '0';
+	if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+	if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+	return -1; // invalid char
+}
+
+int hexstr_to_key(const char *hexstr, uint8_t key[8])
+{
+	size_t i = 0;
+
+	// Initialise le key buffer à 0
+	for (size_t j = 0; j < 8; j++)
+		key[j] = 0;
+
+	while (hexstr[i] && i / 2 < 8)
+	{
+		int val = hex_char_to_val(hexstr[i]);
+		if (val < 0)
+			return 1;
+
+		if (i % 2 == 0)
+			key[i / 2] = val << 4;
+		else
+			key[i / 2] |= val;
+
+		i++;
+	}
+
+	return 0;
+}
+
 int	prepare_des_crypt_params(t_context *ctx)
 {
 	if (ctx->des_flags.key_hex) {
-		if (hexstr_to_bytes(ctx->des_flags.key_hex, ctx->des_flags.key, 8) != 0) {
+		if (hexstr_to_key(ctx->des_flags.key_hex, ctx->des_flags.key) != 0) {
 			write(2, "ft_ssl des: invalid key hex string\n", 35);
 			return 1;
 		}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   encoder.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 17:07:09 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/28 17:58:16 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/09/02 16:14:06 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,16 +74,13 @@ char	*base64_decode(const char *input, size_t *decoded_len)
 	return output;
 }
 
-char	*base64_encode(const char *input)
+char *base64_encode(const char *input, size_t input_len)
 {
 	if (!input)
 		return NULL;
 
-	size_t input_len = ft_strlen(input);
 	size_t output_len = 4 * ((input_len + 2) / 3);
-
-	char *output = (char *)malloc(output_len + 1);
-
+	char *output = malloc(output_len + 1);
 	if (!output)
 		return NULL;
 
@@ -98,9 +95,15 @@ char	*base64_encode(const char *input)
 
 		output[j++] = base64_table[(triple >> 18) & 0x3F];
 		output[j++] = base64_table[(triple >> 12) & 0x3F];
-		output[j++] = (i > input_len + 1) ? '=' : base64_table[(triple >> 6) & 0x3F];
-		output[j++] = (i > input_len) ? '=' : base64_table[triple & 0x3F];
-		
+		if (i - 1 < input_len)
+			output[j++] = base64_table[(triple >> 6) & 0x3F];
+		else
+			output[j++] = '=';
+
+		if (i < input_len)
+			output[j++] = base64_table[triple & 0x3F];
+		else
+			output[j++] = '=';
 	}
 	output[j] = '\0';
 	return output;
