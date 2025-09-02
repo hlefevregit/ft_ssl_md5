@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 11:53:12 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/29 16:13:20 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/09/02 18:01:37 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,4 +146,10 @@ char    *ft_strdup(const char *s)
 	for (size_t i = 0; i <= len; i++)
 		dup[i] = s[i];
 	return dup;
+}
+
+void xor_blocks(const uint8_t *a, const uint8_t *b, uint8_t *out)
+{
+	for (size_t i = 0; i < 8; i++)
+		out[i] = a[i] ^ b[i];
 }

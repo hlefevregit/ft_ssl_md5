@@ -6,7 +6,7 @@
 /*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/29 10:33:50 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/09/02 15:44:40 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/09/02 18:37:48 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,7 +172,10 @@ int	prepare_des_crypt_params(t_context *ctx)
 			}
 
 			ctx->des_flags.password = ft_strdup(pwd1);
-
+			if (derive_key_iv_from_password(ctx)) {
+				free((void *)ctx->des_flags.password);
+				return 1;
+			}
 		} else {
 			write(2, "ft_ssl des: must provide either key (-k) or password (-p)\n", 58);
 			return 1;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_types.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 17:21:55 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/29 11:23:56 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/09/02 18:01:50 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,10 +90,10 @@ void	free_context(t_context *ctx);
 void	ft_memcpy(void *dst, const void *src, size_t n);
 void    *ft_memset(void *b, int c, size_t len);
 void	*ft_calloc(size_t count, size_t size);
+void	xor_blocks(const uint8_t *a, const uint8_t *b, uint8_t *out);
 
 char	*ft_strdup(const char *s);
 
 size_t	ft_strlen(const char *s);
-
 
 #endif

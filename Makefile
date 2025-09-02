@@ -24,7 +24,9 @@ SRCS        := ./src/main.c \
 			./src/des/ecb/encrypter.c \
 			./src/des/ecb/schedule.c \
 			./src/des/ecb/des_f.c \
-			# ./src/des/cbc/process.c \
+			./src/des/cbc/process.c \
+			./src/des/cbc/encrypter.c \
+
 
 
 OBJS        := $(SRCS:.c=.o)

@@ -1,0 +1,10 @@
+Chiffrement :
+C[i] = des_encrypt(P[i] ^ C[i - 1])
+C[0] = des_encrypt(P[0] ^ IV)
+
+Dechiffrmeent :
+P[i] = des_decrypt(C[i] ^ C[i - 1])
+P[0] = des_decrypt(C[i] ^ IV)
+
+NECESSITE UN INITIAL VECTOR (IV) :
+un tableau de 8 octets (uint8_t iv[8])
