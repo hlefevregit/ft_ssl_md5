@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   args_process.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/29 10:33:50 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/09/02 18:37:48 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/09/04 15:20:45 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,7 @@ int hexstr_to_key(const char *hexstr, uint8_t key[8])
 	return 0;
 }
 
-int	prepare_des_crypt_params(t_context *ctx)
+int prepare_des_crypt_params(t_context *ctx)
 {
 	if (ctx->des_flags.key_hex) {
 		if (hexstr_to_key(ctx->des_flags.key_hex, ctx->des_flags.key) != 0) {
@@ -159,37 +159,51 @@ int	prepare_des_crypt_params(t_context *ctx)
 			return 1;
 		}
 	} else if (ctx->des_flags.password) {
+		// Password fourni via -p
 		if (derive_key_iv_from_password(ctx))
 			return 1;
-	} else if (!ctx->des_flags.password) {
-		if (ctx->des_flags.print_key) {
-			char *pwd1 = getpass("Enter password: ");
-			char *pwd2 = getpass("Verifying - Enter password: ");
+	} else if (ctx->des_flags.print_key) {
+		// Pas de -p mais -P (print_key), donc demander à l'utilisateur
+		char *tmp_pwd1 = getpass("Enter password: ");
+		char *pwd1 = tmp_pwd1 ? ft_strdup(tmp_pwd1) : NULL;
 
-			if (!pwd1 || !pwd2 || ft_strcmp(pwd1, pwd2) != 0) {
-				write(2, "ft_ssl des: passwords do not match\n", 35);
-				return 1;
-			}
-
-			ctx->des_flags.password = ft_strdup(pwd1);
-			if (derive_key_iv_from_password(ctx)) {
-				free((void *)ctx->des_flags.password);
-				return 1;
-			}
-		} else {
-			write(2, "ft_ssl des: must provide either key (-k) or password (-p)\n", 58);
+		char *tmp_pwd2 = getpass("Verifying - Enter password: ");
+		char *pwd2 = tmp_pwd2 ? ft_strdup(tmp_pwd2) : NULL;
+		
+		if (!pwd1 || !pwd2 || ft_strcmp(pwd1, pwd2) != 0) {
+			if (pwd1) free(pwd1);
+			if (pwd2) free(pwd2);
+			write(2, "ft_ssl des: passwords do not match\n", 35);
 			return 1;
 		}
+
+		
+		ctx->des_flags.password = pwd1;
+		ctx->des_flags.should_free_password = 1;
+
+		if (derive_key_iv_from_password(ctx)) {
+			free(pwd1);
+			free(pwd2);
+			ctx->des_flags.password = NULL;
+			return 1;
+		}
+
+		free(pwd2); // on garde pwd1 dans le ctx, on libère juste l’autre
 	} else {
+		// Aucun mot de passe ou clé fourni
 		write(2, "ft_ssl des: must provide either key (-k) or password (-p)\n", 58);
+		return 1;
 	}
 
+	// Traiter IV si présent
 	if (ctx->des_flags.iv_hex) {
 		if (hexstr_to_bytes(ctx->des_flags.iv_hex, ctx->des_flags.iv, 8) != 0) {
 			write(2, "ft_ssl des: invalid IV format\n", 30);
 			return 1;
 		}
 	}
+
+	// Affichage optionnel
 	if (ctx->des_flags.print_key) {
 		write(1, "salt=", 5);
 		print_hex(ctx->des_flags.salt, 8);
@@ -199,5 +213,6 @@ int	prepare_des_crypt_params(t_context *ctx)
 		print_hex(ctx->des_flags.iv, 8);
 		write(1, "\n", 1);
 	}
+
 	return 0;
 }

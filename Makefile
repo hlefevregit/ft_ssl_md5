@@ -1,7 +1,7 @@
 # ========== CONFIGURATION ==========
 NAME        := ft_ssl
 CC          := gcc
-CFLAGS      := -Wall -Wextra -Werror
+CFLAGS      := -Wall -Wextra -Werror -g
 
 # Add your .c files here
 SRCS        := ./src/main.c \

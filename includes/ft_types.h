@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_types.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 17:21:55 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/09/02 18:01:50 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/09/04 15:05:44 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ typedef struct s_des_flags {
 	const char *salt_hex;
 	const char *iv_hex;
 	const char *password;
+	int	 		should_free_password;
 
 	uint8_t key[8];
 	uint8_t iv[8];

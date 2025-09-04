@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   reader.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 12:08:07 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/25 12:09:36 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/09/04 15:34:41 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,13 +60,11 @@ char	*read_file(const char *filename)
 			return NULL;
 		}
 		for (int i = 0; i < total; i++)
-			new_res[i] = res ? res[i] : 0;
+			new_res[i] = res[i];
 		for (int i = 0; i < ret; i++)
 			new_res[total + i] = buffer[i];
-
 		new_res[total + ret] = '\0';
-		if (res)
-			free(res);
+		free(res);
 		res = new_res;
 		total += ret;
 	}

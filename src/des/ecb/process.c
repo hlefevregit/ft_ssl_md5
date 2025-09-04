@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   process.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/29 14:08:16 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/09/02 17:29:45 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/09/04 15:24:21 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,11 @@
  char *des_ecb_process(t_context *ctx)
 {
 	if (prepare_des_crypt_params(ctx) != 0)
+	{
+		if (ctx->des_flags.should_free_password == 1)
+			free((void *)ctx->des_flags.password);
 		return NULL;
+	}
 
 	char *input_str = ctx->des_flags.infile ? read_file(ctx->des_flags.infile) : read_stdin();
 	if (!input_str) {
@@ -92,9 +96,17 @@
 
 	if (ctx->des_flags.outfile) {
 		write_file(ctx->des_flags.outfile, result);
+		if (ctx->des_flags.should_free_password == 1)
+			free((void *)ctx->des_flags.password);
 		free(result);
 		result = NULL;
 	}
+
+	// if (ctx->des_flags.should_free_password == 1)
+	// {
+	// 	if (ctx->des_flags.password != NULL)
+	// 		free((void *)ctx->des_flags.password);
+	// }
 
 	free(data);
 	free(output);

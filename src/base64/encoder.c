@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   encoder.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 17:07:09 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/09/02 16:14:06 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/09/04 15:51:32 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,17 @@ static const uint8_t decode_table[256] = {
 char	*base64_decode(const char *input, size_t *decoded_len)
 {
 	if (!input)
+	{
+		printf("Input is NULL\n");	
 		return NULL;
+	}
 
 	size_t input_len = ft_strlen(input);
 	if (input_len % 4 != 0)
+	{
+		printf("Invalid base64 input length\n");	
 		return NULL;
+	}
 
 	*decoded_len = (input_len / 4) * 3;
 
@@ -74,6 +80,7 @@ char	*base64_decode(const char *input, size_t *decoded_len)
 	return output;
 }
 
+
 char *base64_encode(const char *input, size_t input_len)
 {
 	if (!input)
@@ -87,24 +94,23 @@ char *base64_encode(const char *input, size_t input_len)
 	size_t i = 0, j = 0;
 	while (i < input_len)
 	{
-		uint32_t octet_a = i < input_len ? (unsigned char)input[i++] : 0;
-		uint32_t octet_b = i < input_len ? (unsigned char)input[i++] : 0;
-		uint32_t octet_c = i < input_len ? (unsigned char)input[i++] : 0;
+		uint8_t octet_a = i < input_len ? (unsigned char)input[i++] : 0;
+		uint8_t octet_b = i < input_len ? (unsigned char)input[i++] : 0;
+		uint8_t octet_c = i < input_len ? (unsigned char)input[i++] : 0;
 
 		uint32_t triple = (octet_a << 16) | (octet_b << 8) | octet_c;
 
-		output[j++] = base64_table[(triple >> 18) & 0x3F];
-		output[j++] = base64_table[(triple >> 12) & 0x3F];
-		if (i - 1 < input_len)
-			output[j++] = base64_table[(triple >> 6) & 0x3F];
-		else
-			output[j++] = '=';
+		output[j++] = base64_table[(triple >> 3 * 6) & 0x3F];
+		output[j++] = base64_table[(triple >> 2 * 6) & 0x3F];
+		output[j++] = base64_table[(triple >> 1 * 6) & 0x3F];
+		output[j++] = base64_table[(triple >> 0 * 6) & 0x3F];
+		
 
-		if (i < input_len)
-			output[j++] = base64_table[triple & 0x3F];
-		else
-			output[j++] = '=';
+		
 	}
+	for(size_t k = 0; k < (3 - (input_len % 3)) % 3; k++)
+		output[output_len - 1 - k] = '=';
+
 	output[j] = '\0';
 	return output;
 }

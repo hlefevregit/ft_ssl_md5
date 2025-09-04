@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   process.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/02 17:50:59 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/09/02 17:59:50 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/09/04 15:01:42 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,11 @@ char *des_cbc_process(t_context *ctx)
 	char *input_str = ctx->des_flags.infile ? read_file(ctx->des_flags.infile) : read_stdin();
 	if (!input_str) {
 		write(2, "ft_ssl des: failed to read input\n", 33);
+		free(input_str);
 		return NULL;
 	}
+	
+	// free(input_str);
 
 	size_t len = 0;
 
@@ -36,6 +39,11 @@ char *des_cbc_process(t_context *ctx)
 		free(input_str);
 		input_str = (char *)decoded;
 		len = decoded_len;
+		// if (len % 8 != 0) {
+		// 	write(2, "ft_ssl des: invalid input length for DES\n", 41);
+		// 	free(input_str);
+		// 	return NULL;
+		// }
 	} else {
 		len = ft_strlen(input_str);
 	}
