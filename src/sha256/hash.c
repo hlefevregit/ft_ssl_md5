@@ -6,7 +6,7 @@
 /*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 13:46:16 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/08/25 17:35:31 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/08/26 16:36:01 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,9 @@ static const uint32_t K[64] = {
 	0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 };
 
-char *sha256_hash(const char *input)
+char *sha256_hash(t_context *ctx)
 {
+	char *input = ctx->inputs->data;
 	size_t len = ft_strlen(input);
 	size_t padded_len;
 	uint8_t *padded = sha_pad((const uint8_t *)input, len, &padded_len);
